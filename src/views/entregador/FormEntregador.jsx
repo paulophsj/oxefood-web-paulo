@@ -3,17 +3,14 @@ import React, { useState } from "react";
 import { Button, Container, Divider, Form, Icon } from 'semantic-ui-react';
 
 export default function FormEntregador() {
-    const [radio, setRadio] = useState()
+    const [radio, setRadio] = useState();
 
-    //const handleChange = (e) => setRadio(e.target.value)
+    const handleChange = (e, { value }) => setRadio(value);
 
     return (
-
         <div>
-
             <div style={{ marginTop: '3%' }}>
-
-                <Container textAlign='justified' >
+                <Container textAlign='justified'>
                     <h2> <span style={{ color: 'darkgray' }}> Entregador &nbsp;<Icon name='angle double right' size="small" /> </span> Cadastro </h2>
 
                     <Divider />
@@ -48,8 +45,8 @@ export default function FormEntregador() {
                                         mask="99.999.999"
                                     />
                                 </Form.Input>
-
                             </Form.Group>
+
                             <Form.Group widths="equal">
                                 <Form.Input
                                     label="DT Nascimento"
@@ -84,6 +81,7 @@ export default function FormEntregador() {
                                     label="Valor por Frete"
                                 />
                             </Form.Group>
+
                             <Form.Group widths="equal">
                                 <Form.Input
                                     fluid
@@ -96,6 +94,7 @@ export default function FormEntregador() {
                                     type='Number'
                                 />
                             </Form.Group>
+
                             <Form.Group widths="equal">
                                 <Form.Input
                                     fluid
@@ -121,32 +120,32 @@ export default function FormEntregador() {
                                 placeholder='Selecione'
                             >
                             </Form.Select>
+
                             <Form.Input
                                 label="Complemento"
                                 fluid
                                 maxLength="200"
                             />
+
                             <Form.Group>
                                 <label style={{ fontWeight: 'bold', marginLeft: "5px" }}>Ativo: </label>
                                 <Form.Radio
                                     label="Sim"
                                     value={1}
                                     name='inputRadio'
-                                    checked={radio == 1}
-                                    //onChange={handleChange}
+                                    checked={radio === 1}
+                                    onChange={handleChange}
                                 />
                                 <Form.Radio
                                     label="Não"
                                     value={0}
                                     name='inputRadio'
-                                    checked={radio == 0}
-                                    //onChange={handleChange}
-
+                                    checked={radio === 0}
+                                    onChange={handleChange}
                                 />
                             </Form.Group>
                         </Form>
                         <div style={{ marginTop: '4%' }}>
-
                             <Button
                                 type="button"
                                 inverted
@@ -170,7 +169,6 @@ export default function FormEntregador() {
                                 <Icon name='save' />
                                 Salvar
                             </Button>
-
                         </div>
                     </div>
                 </Container>
