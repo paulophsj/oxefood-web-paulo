@@ -1,53 +1,82 @@
 import InputMask from 'comigo-tech-react-input-mask';
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Container, Divider, Form, Icon } from 'semantic-ui-react';
 import axios from 'axios'
 import MenuSistema from '../../MenuSistema';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
-export default function FormCliente () {
+export default function FormCliente() {
+    const { state } = useLocation();
+    const [cliente, setCliente] = useState({
+        id: null,
+        nome: null,
+        cpf: null,
+        dataNascimento: null,
+        foneCelular: null,
+        foneFixo: null
+    })
+
+    const handleChange = (e) => {
+        setCliente(prev => ({
+            ...prev,[e.target.name]: e.target.value
+        }))
+    }
+    useEffect(() => {
+        if (state !== null && state.id !== null) {
+            axios.get("http://localhost:8080/api/cliente/" + state.id)
+                .then((response) => {
+                    setCliente({
+                        id: response.data.id,
+                        nome: response.data.nome,
+                        cpf: response.data.cpf,
+                        dataNascimento: response.data.dataNascimento,
+                        foneCelular: response.data.foneCelular,
+                        foneFixo: response.data.foneFixo
+                    })
+                })
+        }
+    }, [state])
 
     function salvar() {
 
-		let clienteRequest = {
-		     nome: nome,
-		     cpf: cpf,
-		     dataNascimento: dataNascimento,
-		     foneCelular: foneCelular,
-		     foneFixo: foneFixo
-		}
+        let clienteRequest = {
+            nome: cliente.nome,
+            cpf: cliente.cpf,
+            dataNascimento: cliente.dataNascimento,
+            foneCelular: cliente.foneCelular,
+            foneFixo: cliente.foneFixo
+        }
+        if (cliente.id !== null) { //Alteração:
+            axios.put("http://localhost:8080/api/cliente/" + cliente.id, clienteRequest)
+                .then((response) => { console.log('Cliente alterado com sucesso.') })
+                .catch((error) => { console.log('Erro ao alter um cliente.') })
+        } else { //Cadastro:
+            axios.post("http://localhost:8080/api/cliente", clienteRequest)
+                .then((response) => { console.log('Cliente cadastrado com sucesso.') })
+                .catch((error) => { console.log('Erro ao incluir o cliente.') })
+        }
 
-		axios.post("http://localhost:8080/api/cliente", clienteRequest)
-		.then((response) => {
-		     console.log('Cliente cadastrado com sucesso.')
-		})
-		.catch((error) => {
-		     console.log('Erro ao incluir o um cliente.')
-		})
-	}
-
-
-    const [nome, setNome] = useState();
-    const [cpf, setCpf] = useState();
-    const [dataNascimento, setDataNascimento] = useState();
-    const [foneCelular, setFoneCelular] = useState();
-    const [foneFixo, setFoneFixo] = useState();
- 
+    }
 
     return (
 
         <div>
-             <MenuSistema tela={'cliente'} />
+            <MenuSistema tela={'cliente'} />
 
-            <div style={{marginTop: '3%'}}>
+            <div style={{ marginTop: '3%' }}>
 
                 <Container textAlign='justified' >
 
-                    <h2> <span style={{color: 'darkgray'}}> Cliente &nbsp;<Icon name='angle double right' size="small" /> </span> Cadastro </h2>
+                    {cliente.id === undefined &&
+                        <h2> <span style={{ color: 'darkgray' }}> Cliente &nbsp;<Icon name='angle double right' size="small" /> </span> Cadastro</h2>
+                    }
+                    {cliente.id !== undefined &&
+                        <h2> <span style={{ color: 'darkgray' }}> Cliente &nbsp;<Icon name='angle double right' size="small" /> </span> Alteração</h2>
+                    }
 
                     <Divider />
 
-                    <div style={{marginTop: '4%'}}>
+                    <div style={{ marginTop: '4%' }}>
 
                         <Form>
 
@@ -57,9 +86,10 @@ export default function FormCliente () {
                                     required
                                     fluid
                                     label='Nome'
+                                    name="nome"
                                     maxLength="100"
-                                    value={nome}
-                                    onChange={e => setNome(e.target.value)}
+                                    value={cliente.nome}
+                                    onChange={e => handleChange(e)}
                                 />
 
                                 <Form.Input
@@ -69,35 +99,38 @@ export default function FormCliente () {
                                     <InputMask
                                         required
                                         mask="999.999.999-99"
-                                        value={cpf}
-                                        onChange={e => setCpf(e.target.value)}
-                                    /> 
+                                        value={cliente.cpf}
+                                        name="cpf"
+                                        onChange={e => handleChange(e)}
+                                    />
                                 </Form.Input>
 
                             </Form.Group>
-                            
+
                             <Form.Group>
 
                                 <Form.Input
                                     fluid
                                     label='Fone Celular'
                                     width={6}>
-                                    <InputMask 
+                                    <InputMask
                                         mask="(99) 9999.9999"
-                                        value={foneCelular}
-                                        onChange={e => setFoneCelular(e.target.value)}
-                                    /> 
+                                        value={cliente.foneCelular}
+                                        name="foneCelular"
+                                        onChange={e => handleChange(e)}
+                                    />
                                 </Form.Input>
 
                                 <Form.Input
                                     fluid
                                     label='Fone Fixo'
                                     width={6}>
-                                    <InputMask 
+                                    <InputMask
                                         mask="(99) 9999.9999"
-                                        value={foneFixo}
-                                        onChange={e => setFoneFixo(e.target.value)}
-                                    /> 
+                                        value={cliente.foneFixo}
+                                        name="foneFixo"
+                                        onChange={e => handleChange(e)}
+                                    />
                                 </Form.Input>
 
                                 <Form.Input
@@ -105,22 +138,23 @@ export default function FormCliente () {
                                     label='Data Nascimento'
                                     width={6}
                                 >
-                                    <InputMask 
-                                        mask="99/99/9999" 
+                                    <InputMask
+                                        mask="99/99/9999"
                                         maskChar={null}
                                         placeholder="Ex: 20/03/1985"
-                                        value={dataNascimento}
-                                        onChange={e => setDataNascimento(e.target.value)}
-                                    /> 
+                                        name="dataNascimento"
+                                        value={cliente.dataNascimento}
+                                        onChange={e => handleChange(e)}
+                                    />
                                 </Form.Input>
 
                             </Form.Group>
-                        
-                        </Form>
-                        
-                        <div style={{marginTop: '4%'}}>
 
-                        <Link to={'/list-cliente'}>
+                        </Form>
+
+                        <div style={{ marginTop: '4%' }}>
+
+                            <Link to={'/list-cliente'}>
                                 <Button
                                     inverted
                                     circular
@@ -131,7 +165,7 @@ export default function FormCliente () {
                                     <Icon name='reply' /> Listar
                                 </Button>
                             </Link>
-                                
+
                             <Button
                                 inverted
                                 circular
@@ -148,7 +182,7 @@ export default function FormCliente () {
                         </div>
 
                     </div>
-                    
+
                 </Container>
             </div>
         </div>
