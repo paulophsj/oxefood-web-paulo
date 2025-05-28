@@ -7,8 +7,8 @@ import MenuSistema from "../../MenuSistema";
 export default function FormCategoria() {
     const { state } = useLocation();
     const [categoria, setCategoria] = useState({
-        id: "",
-        descricao: ""
+        id: null,
+        descricao: null
     })
     const handleChange = (e) => {
         setCategoria(prev => ({
@@ -21,8 +21,8 @@ export default function FormCategoria() {
             axios.get("http://localhost:8080/api/categoria_produto/" + state.id)
                 .then((response) => {
                     setCategoria({
-                        id: response.id,
-                        descricao: response.descricao
+                        id: response.data.id,
+                        descricao: response.data.descricao
                     })
                 })
         }
@@ -37,7 +37,7 @@ export default function FormCategoria() {
                 .then((response) => { console.log('categoria alterado com sucesso.') })
                 .catch((error) => { console.log('Erro ao alter um categoria.') })
         } else { //Cadastro:
-            axios.post("http://localhost:8080/api/categoria_produto/", categoriaRequest)
+            axios.post("http://localhost:8080/api/categoria_produto", categoriaRequest)
                 .then((response) => { console.log('categoria cadastrado com sucesso.') })
                 .catch((error) => { console.log('Erro ao incluir o categoria.') })
         }
@@ -66,6 +66,8 @@ export default function FormCategoria() {
                                 required
                                 fluid
                                 label="Categoria"
+                                name ='descricao'
+                                value={categoria.descricao}
                                 onChange={e => handleChange(e)}
                             >
                             </Form.Input>
